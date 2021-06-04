@@ -94,7 +94,6 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
     },
     useSortBy,
     useExpanded,
-    useExpanded,
     usePagination
   );
 
