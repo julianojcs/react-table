@@ -1,11 +1,11 @@
 import styled from "styled-components";
-import React, { useMemo } from "react";
+import React, { useMemo, useState, Fragment } from "react";
 import { useTable, useSortBy, useExpanded, usePagination } from "react-table";
 import {
-  FaChevronDown as DownIcon,
-  FaChevronUp as UpIcon
-} from "react-icons/fa";
-import { Fragment } from "react";
+  RiArrowRightSFill as ArrowRight,
+  RiArrowLeftSFill as ArrowLeft,
+  RiArrowDownSFill as ArrowDown
+} from "react-icons/ri";
 import sortAsc from "./Assets/sort_asc.png";
 import sortDesc from "./Assets/sort_desc.png";
 import sortBoth from "./Assets/sort_both.png";
@@ -39,6 +39,30 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
         dataInicio: "2021-04-11",
         dataFim: null,
         resumo: "Filho De Luis Carlos."
+      },
+      {
+        nome: "Hometown",
+        dataInicio: "2018-09-01",
+        dataFim: "2018-05-30",
+        resumo: "Durante os anos 20."
+      },
+      {
+        nome: "Espanhol",
+        dataInicio: "2021-04-11",
+        dataFim: null,
+        resumo: "Pai De Juan."
+      },
+      {
+        nome: "Casa Blanca",
+        dataInicio: "2018-09-01",
+        dataFim: "2018-05-30",
+        resumo: "General da 2a guerra"
+      },
+      {
+        nome: "Fortunato Abreu",
+        dataInicio: "2021-04-11",
+        dataFim: null,
+        resumo: "Desaparecido a 1 mês."
       }
     ],
     []
@@ -50,7 +74,7 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
         // Header: () => null,
         Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
           <span {...getToggleAllRowsExpandedProps()}>
-            {isAllRowsExpanded ? <UpIcon /> : <DownIcon />}
+            {isAllRowsExpanded ? <ArrowDown /> : <ArrowRight />}
           </span>
         ),
         id: "expander",
@@ -58,7 +82,7 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
         Cell: ({ row }) => (
           <span {...row.getToggleRowExpandedProps()}>
             {/* {row.isExpanded ? <FaChevronUp /> : <FaChevronDown />} */}
-            {row.isExpanded ? <UpIcon /> : <DownIcon />}
+            {row.isExpanded ? <ArrowDown /> : <ArrowRight />}
           </span>
         )
       },
@@ -88,9 +112,8 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
     {
       data,
       columns,
-      defaultPageSize: 10,
       showPagination: true,
-      initialState: { expanded: false }
+      initialState: { expanded: {}, pageIndex: 0, pageSize: 3 }
     },
     useSortBy,
     useExpanded,
@@ -102,9 +125,18 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
     getTableBodyProps,
     headerGroups,
     rows,
+    page,
     prepareRow,
-    state: { expanded },
-    visibleColumns
+    visibleColumns,
+    canPreviousPage,
+    canNextPage,
+    pageOptions,
+    // pageCount,
+    gotoPage,
+    nextPage,
+    previousPage,
+    setPageSize,
+    state: { expanded, pageIndex, pageSize }
   } = tableInstance;
 
   //   const getOptions = async () => {
@@ -144,6 +176,8 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
     );
   };
 
+  const rowPerPage = pageIndex * pageSize + page.length;
+
   return (
     <ModalContainerStyled>
       <Content>
@@ -168,7 +202,7 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
               ))}
             </thead>
             <tbody {...getTableBodyProps()}>
-              {rows.map((row) => {
+              {page.map((row) => {
                 prepareRow(row);
                 console.log(row);
                 return (
@@ -194,10 +228,42 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
               })}
             </tbody>
           </table>
-          <div style={{ paddingTop: "1rem" }}>
-            Showing the first {rows.length > 10 ? "10" : rows.length} results of{" "}
-            {rows.length} rows
-          </div>
+          <TableFooter>
+            <Info>
+              {`Visualizando de ${pageIndex * pageSize + 1} à ${rowPerPage} (${
+                rows.length
+              } registros)`}
+            </Info>
+
+            <Pagination>
+              <button
+                className="navButton arrow"
+                onClick={() => previousPage()}
+                disabled={!canPreviousPage}
+              >
+                <ArrowLeft />
+              </button>
+
+              {pageOptions.map((page) => (
+                <button
+                  key={page}
+                  className={pageIndex === page ? "actual" : "navButton"}
+                  onClick={() => gotoPage(page)}
+                  disabled={pageIndex === page}
+                >
+                  {page + 1}
+                </button>
+              ))}
+
+              <button
+                className="navButton arrow"
+                onClick={() => nextPage()}
+                disabled={!canNextPage}
+              >
+                <ArrowRight />
+              </button>
+            </Pagination>
+          </TableFooter>
           <pre>
             <code>{JSON.stringify({ expanded: expanded }, null, 2)}</code>
           </pre>
@@ -206,6 +272,72 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
     </ModalContainerStyled>
   );
 };
+
+const TableComponents = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+const TableFooter = styled(TableComponents)`
+  align-items: flex-end;
+`;
+
+const Pagination = styled.div`
+  display: flex;
+  gap: 3px;
+  color: #333;
+
+  .navButton {
+    border: none;
+    background: white;
+    text-align: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.875rem;
+    outline: none;
+    :disabled {
+      cursor: default;
+      background: transparent;
+      border: none;
+    }
+    :not(:disabled):hover {
+      color: white;
+      border-radius: 5px;
+      border: 1px solid var(--clr-primary-dark);
+      cursor: pointer;
+      background: linear-gradient(
+        to bottom,
+        var(--clr-primary-light) 0%,
+        var(--clr-primary) 100%
+      );
+    }
+  }
+  .actual {
+    border: 1px solid #979797;
+    background: linear-gradient(to bottom, #fff 0%, #dcdcdc 100%);
+    cursor: default;
+    border-radius: 5px;
+    font-size: 0.875rem;
+    outline: none;
+  }
+  .arrow {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+`;
+
+const Info = styled.div`
+  white-space: nowrap;
+  padding-top: 0.85rem;
+  color: #333;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  outline: none;
+  text-align: left;
+`;
 
 const Styles = styled.div`
   padding: 1rem;
