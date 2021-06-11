@@ -1,5 +1,5 @@
 import React from "react";
-import ModalContainer from "./ModalContainer";
+import ModalContainer from './Components/ModalContainer'
 
 const App = () => {
   return <ModalContainer />;
