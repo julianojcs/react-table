@@ -108,18 +108,6 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
     []
   );
 
-  const tableInstance = useTable(
-    {
-      data,
-      columns,
-      showPagination: true,
-      initialState: { expanded: {}, pageIndex: 0, pageSize: 3 }
-    },
-    useSortBy,
-    useExpanded,
-    usePagination
-  );
-
   const {
     getTableProps,
     getTableBodyProps,
@@ -137,18 +125,17 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
     previousPage,
     setPageSize,
     state: { expanded, pageIndex, pageSize }
-  } = tableInstance;
-
-  //   const getOptions = async () => {
-  //     const options = POST_OPTIONS_SELECT(coin, base)
-  //     const { response, json } = await request(API_URL, options)
-  //
-  //     if (response.status !== 200 && response.status !== 201) {
-  //       throw new Error(`Token inválido`)
-  //     }
-  //
-  //     setSelectOptions(json.data.options)
-  //   }
+  } = useTable(
+    {
+      data,
+      columns,
+      showPagination: true,
+      initialState: { expanded: {}, pageIndex: 0, pageSize: 3 }
+    },
+    useSortBy,
+    useExpanded,
+    usePagination
+  )
 
   const renderRowSubComponent = (row) => {
     console.log(row.original);
@@ -176,7 +163,9 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
     );
   };
 
-  const rowPerPage = pageIndex * pageSize + page.length;
+  const totalRows = rows.length
+  const rowPerPage = pageIndex * pageSize + page.length
+  const rowOnPage = rows.length > 0 ? (pageIndex * pageSize + 1) : 0
 
   return (
     <ModalContainerStyled>
@@ -230,14 +219,16 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
           </table>
           <TableFooter>
             <Info>
-              {`Visualizando de ${pageIndex * pageSize + 1} à ${rowPerPage} (${
-                rows.length
-              } registros)`}
+              {totalRows 
+              ? `Visualizando de ${rowOnPage} à ${rowPerPage} (${totalRows} registros)`
+              : <EmptyTable>Tabela vazia</EmptyTable>
+              }
             </Info>
 
+            {!!totalRows && 
             <Pagination>
               <button
-                className="navButton arrow"
+                className='navButton arrow'
                 onClick={() => previousPage()}
                 disabled={!canPreviousPage}
               >
@@ -247,7 +238,7 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
               {pageOptions.map((page) => (
                 <button
                   key={page}
-                  className={pageIndex === page ? "actual" : "navButton"}
+                  className={pageIndex === page ? 'actual' : 'navButton'}
                   onClick={() => gotoPage(page)}
                   disabled={pageIndex === page}
                 >
@@ -256,13 +247,13 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
               ))}
 
               <button
-                className="navButton arrow"
+                className='navButton arrow'
                 onClick={() => nextPage()}
                 disabled={!canNextPage}
               >
                 <ArrowRight />
               </button>
-            </Pagination>
+            </Pagination>}
           </TableFooter>
           <pre>
             <code>{JSON.stringify({ expanded: expanded }, null, 2)}</code>
@@ -272,6 +263,15 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
     </ModalContainerStyled>
   );
 };
+
+const EmptyTable = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--bs-danger);
+`
 
 const TableComponents = styled.div`
   display: flex;
@@ -331,13 +331,14 @@ const Pagination = styled.div`
 
 const Info = styled.div`
   white-space: nowrap;
+  width: 100%;
   padding-top: 0.85rem;
   color: #333;
   font-size: 0.875rem;
   line-height: 1.5;
   outline: none;
   text-align: left;
-`;
+`
 
 const Styles = styled.div`
   padding: 1rem;
@@ -347,26 +348,69 @@ const Styles = styled.div`
   table {
     border-spacing: 0;
     width: 100%;
+    max-height: 100%;
+    min-height: 51px;
+    overflow-y: auto;
     thead {
+      color: var(--clr-secondary-dark);
       tr {
+        border-bottom: 1px solid var(--clr-primary);
+        vertical-align: baseline;
         th {
           padding-left: 0.3rem;
+          :first-child {
+            div { 
+              padding-left: 0;
+              justify-content: center;
+            }
+            padding-left: 0;
+            width: 2rem;
+          }
+          :last-child {
+            width: 3.5rem;
+          }
         }
         div {
           display: flex;
           justify-content: space-between;
           align-content: center;
           user-select: none;
+          :hover{
+            color: var(--clr-primary);
+          }
         }
       }
     }
     tbody {
       tr {
+        :hover {
+          background-color: #f6f6f6 !important;
+        }
         td {
           margin: 0;
           padding: 0.3rem;
           border-top: 1px solid #ddd;
           border-right: 1px solid #ddd;
+          .cell {
+            width: 100%;
+            display: flex;
+            gap: 0.3rem;
+          }
+          :first-child {
+            div {
+              justify-content: center;
+              margin-bottom: -2px;
+              margin-right: -2px;
+              svg:hover{
+                color: var(--clr-primary);
+              }
+            }
+          }
+        }
+        :first-child {
+          td {
+            border-top: 1px solid #000;
+          }
         }
         :last-child {
           td {

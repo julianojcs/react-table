@@ -1,10 +1,10 @@
 {
   "private": true,
   "scripts": {
-    "start": "rescripts start",
-    "build": "rescripts build",
-    "test": "rescripts test",
-    "eject": "rescripts eject"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "dependencies": {
     "@material-ui/core": "4.11.4",
@@ -37,6 +37,6 @@
     ]
   },
   "keywords": [],
-  "name": "react-table-expand",
+  "name": "react-table",
   "description": ""
 }
