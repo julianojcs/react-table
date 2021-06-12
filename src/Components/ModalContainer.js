@@ -3,7 +3,6 @@ import React, { useMemo, Fragment } from 'react'
 import { useTable, useSortBy, useExpanded, usePagination } from 'react-table'
 import {
   RiArrowRightSFill as ArrowRight,
-  RiArrowLeftSFill as ArrowLeft,
   RiArrowDownSFill as ArrowDown
 } from 'react-icons/ri'
 import sortAsc from '../Assets/sort_asc.png'
@@ -12,6 +11,7 @@ import sortBoth from '../Assets/sort_both.png'
 import { data as tableData } from '../data'
 import Pagination from './Pagination'
 import Info from './Info'
+import RowPerPage from './RowPerPage'
 
 const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
   // const [selectOptions, setSelectOptions] = useState([])
@@ -122,6 +122,13 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
     <ModalContainerStyled>
       <Content>
         <Styles>
+          <TableHeader>
+            <RowPerPage
+              pageSize={pageSize}
+              setPageSize={(e) => setPageSize(e)}
+              totalRows={totalRows}
+            />
+          </TableHeader>
           <table {...getTableProps()}>
             <thead>
               {headerGroups.map((headerGroup) => (
@@ -201,6 +208,12 @@ const TableComponents = styled.div`
   justify-content: space-between;
 `
 
+const TableHeader = styled(TableComponents)`
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+`
+
 const TableFooter = styled(TableComponents)`
   align-items: flex-end;
 `
@@ -216,6 +229,8 @@ const Styles = styled.div`
     max-height: 100%;
     min-height: 51px;
     overflow-y: auto;
+    border-bottom: 1px solid var(--clr-secondary);
+    
     thead {
       color: var(--clr-secondary-dark);
       tr {
@@ -240,6 +255,7 @@ const Styles = styled.div`
           justify-content: space-between;
           align-content: center;
           user-select: none;
+          white-space: nowrap;
           :hover {
             color: var(--clr-primary);
           }
