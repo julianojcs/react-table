@@ -12,37 +12,38 @@ const Pagination = ({
   canNextPage,
   pageOptions,
   pageIndex,
-  gotoPage
+  gotoPage,
+  show
 }) => {
   return (
-    <PaginationStyled>
-      <button
-        className='navButton arrow'
-        onClick={() => previousPage()}
-        disabled={!canPreviousPage}
-      >
-        <ArrowLeft />
-      </button>
-
-      {pageOptions.map((page) => (
+    show && ( 
+      <PaginationStyled>
         <button
-          key={page}
-          className={pageIndex === page ? 'actual' : 'navButton'}
-          onClick={() => gotoPage(page)}
-          disabled={pageIndex === page}
+          className='navButton arrow'
+          onClick={() => previousPage()}
+          disabled={!canPreviousPage}
         >
-          {page + 1}
+          <ArrowLeft />
         </button>
-      ))}
-
-      <button
-        className='navButton arrow'
-        onClick={() => nextPage()}
-        disabled={!canNextPage}
-      >
-        <ArrowRight />
-      </button>
-    </PaginationStyled>
+        {pageOptions.map((page) => (
+          <button
+            key={page}
+            className={pageIndex === page ? 'actual' : 'navButton'}
+            onClick={() => gotoPage(page)}
+            disabled={pageIndex === page}
+          >
+            {page + 1}
+          </button>
+        ))}
+        <button
+          className='navButton arrow'
+          onClick={() => nextPage()}
+          disabled={!canNextPage}
+        >
+          <ArrowRight />
+        </button>
+      </PaginationStyled>
+    )
   )
 }
 

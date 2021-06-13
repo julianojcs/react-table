@@ -151,7 +151,6 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
             <tbody {...getTableBodyProps()}>
               {page.map((row) => {
                 prepareRow(row)
-                console.log(row)
                 return (
                   <Fragment key={row.getRowProps().key}>
                     <tr>
@@ -190,6 +189,7 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
                 pageOptions={pageOptions}
                 pageIndex={pageIndex}
                 gotoPage={gotoPage}
+                show={totalRows > pageSize}
               />
             )}
           </TableFooter>
@@ -238,6 +238,16 @@ const Styles = styled.div`
         vertical-align: baseline;
         th {
           padding-left: 0.3rem;
+          div {
+            display: flex;
+            justify-content: space-between;
+            align-content: center;
+            user-select: none;
+            white-space: nowrap;
+            :hover {
+              color: var(--clr-primary);
+            }
+          }
           :first-child {
             div {
               padding-left: 0;
@@ -247,17 +257,8 @@ const Styles = styled.div`
             width: 2rem;
           }
           :last-child {
+            pointer-events: none;
             width: 3.5rem;
-          }
-        }
-        div {
-          display: flex;
-          justify-content: space-between;
-          align-content: center;
-          user-select: none;
-          white-space: nowrap;
-          :hover {
-            color: var(--clr-primary);
           }
         }
       }
