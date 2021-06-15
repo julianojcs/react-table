@@ -12,6 +12,7 @@ import { data as tableData } from '../data'
 import Pagination from './Pagination'
 import Info from './Info'
 import RowPerPage from './RowPerPage'
+import Filter from './Filter'
 
 const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
   // const [selectOptions, setSelectOptions] = useState([])
@@ -128,6 +129,7 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
               setPageSize={(e) => setPageSize(e)}
               totalRows={totalRows}
             />
+            <Filter />
           </TableHeader>
           <table {...getTableProps()}>
             <thead>
@@ -202,6 +204,16 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
   )
 }
 
+const FilterWrapper = styled.div`
+  position: relative;
+  user-select: none;
+  width: 20rem;
+  background-color: blue;
+  @media (max-width: 1024px) {
+    width: 100%;
+  }
+`
+
 const TableComponents = styled.div`
   display: flex;
   flex-direction: row;
@@ -212,6 +224,7 @@ const TableHeader = styled(TableComponents)`
   align-items: flex-start;
   gap: 1rem;
   margin-bottom: 2rem;
+  flex-flow: wrap-reverse;
 `
 
 const TableFooter = styled(TableComponents)`
@@ -332,6 +345,7 @@ const ModalContainerStyled = styled.div`
     top: 0;
     left: 0;
     border-radius: 0;
+    transform: translate(0%, 0%);
   }
 `
 
