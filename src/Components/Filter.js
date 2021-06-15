@@ -9,7 +9,7 @@ const Filter = ({ filterAll, onChange }) => {
         <input
           type='text'
           value={filterAll}
-          // onChange={(e) => onChange(e)}
+          onChange={(e) => onChange(e)}
           placeholder='Digite um texto...'
         ></input>
       </FilterStyled>

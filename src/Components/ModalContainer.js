@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import React, { useMemo, Fragment } from 'react'
+import React, { useMemo, Fragment, useState, useEffect } from 'react'
 import { useTable, useSortBy, useExpanded, usePagination } from 'react-table'
 import {
   RiArrowRightSFill as ArrowRight,
@@ -14,11 +14,9 @@ import Info from './Info'
 import RowPerPage from './RowPerPage'
 import Filter from './Filter'
 
-const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
-  // const [selectOptions, setSelectOptions] = useState([])
-  // const { loading, request } = useFetch()
-
-  const data = useMemo(() => tableData, [])
+const ModalContainer = () => {
+  const [data, setData] = useState([])
+  const [filterAll, setFilterAll] = useState('')
 
   const columns = useMemo(
     () => [
@@ -114,10 +112,34 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
       </span>
     )
   }
+  
+  const onChangeFilter = ({target}) => {
+    setFilterAll(target.value)
+  }
 
   const totalRows = rows.length
   const rowPerPage = pageIndex * pageSize + page.length
   const rowOnPage = rows.length > 0 ? pageIndex * pageSize + 1 : 0
+
+  useEffect(() => {
+    var theData = []
+    if (filterAll) {
+      theData = tableData.filter(row => {
+        var result = false
+        for (const [key, value] of Object.entries(row)) {
+          if (key!=='id' && value?.toUpperCase().includes(filterAll.toUpperCase())){
+            result = true
+            break
+          }
+        }
+        return result
+      })
+    } else {
+      theData = tableData
+    }
+    setData(theData)
+    }, [filterAll]
+  )
 
   return (
     <ModalContainerStyled>
@@ -129,7 +151,10 @@ const ModalContainer = ({ coin, base, entidade, id, card, setShowModal }) => {
               setPageSize={(e) => setPageSize(e)}
               totalRows={totalRows}
             />
-            <Filter />
+            <Filter
+              filterAll={filterAll}
+              onChange={(e) => onChangeFilter(e)}
+            />
           </TableHeader>
           <table {...getTableProps()}>
             <thead>
