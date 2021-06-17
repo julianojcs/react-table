@@ -1,5 +1,12 @@
 import styled from 'styled-components'
-import React, { useMemo, Fragment, useState, useEffect } from 'react'
+import React, {
+  useMemo,
+  Fragment,
+  useState,
+  useEffect,
+  useRef,
+  forwardRef
+} from 'react'
 import { useTable, useSortBy, useExpanded, usePagination } from 'react-table'
 import {
   RiArrowRightSFill as ArrowRight,
@@ -13,6 +20,17 @@ import Pagination from './Pagination'
 import Info from './Info'
 import RowPerPage from './RowPerPage'
 import Filter from './Filter'
+
+const IndeterminateCheckbox = forwardRef(({ indeterminate, ...rest }, ref) => {
+  const defaultRef = useRef()
+  const resolvedRef = ref || defaultRef
+
+  useEffect(() => {
+    resolvedRef.current.indeterminate = indeterminate
+  }, [resolvedRef, indeterminate])
+
+  return <input type='checkbox' ref={resolvedRef} {...rest} />
+})
 
 const ModalContainer = () => {
   const [data, setData] = useState([])
@@ -41,11 +59,11 @@ const ModalContainer = () => {
         accessor: 'nome' // accessor is the "key" in the data
       },
       {
-        Header: 'Início',
+        Header: 'Data Início',
         accessor: 'dataInicio'
       },
       {
-        Header: 'Fim',
+        Header: 'Data Fim',
         accessor: 'dataFim'
       },
       {
@@ -74,6 +92,8 @@ const ModalContainer = () => {
     nextPage,
     previousPage,
     setPageSize,
+    allColumns,
+    getToggleHideAllColumnsProps,
     state: { expanded, pageIndex, pageSize }
   } = useTable(
     {
@@ -145,16 +165,31 @@ const ModalContainer = () => {
     <ModalContainerStyled>
       <Content>
         <Styles>
+          <div>
+            <div>
+              <IndeterminateCheckbox {...getToggleHideAllColumnsProps()} />{' '}
+              Toggle All
+            </div>
+            {allColumns.map((column) => {
+              if ((column.id!=='expander') && (column.id!=='acao')) {
+              return (
+                <div key={column.id}>
+                  <label>
+                    <input type='checkbox' {...column.getToggleHiddenProps()} />{' '}
+                    {column.Header}
+                  </label>
+                </div>
+              )} else return null
+            })}
+            <br />
+          </div>
           <TableHeader>
             <RowPerPage
               pageSize={pageSize}
               setPageSize={(e) => setPageSize(e)}
               totalRows={totalRows}
             />
-            <Filter
-              filterAll={filterAll}
-              onChange={(e) => onChangeFilter(e)}
-            />
+            <Filter filterAll={filterAll} onChange={(e) => onChangeFilter(e)} />
           </TableHeader>
           <table {...getTableProps()}>
             <thead>
