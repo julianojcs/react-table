@@ -20,6 +20,7 @@ import Pagination from './Pagination'
 import Info from './Info'
 import RowPerPage from './RowPerPage'
 import Filter from './Filter'
+import { FaTrashAlt as DeleteRow } from 'react-icons/fa'
 
 const IndeterminateCheckbox = forwardRef(({ indeterminate, ...rest }, ref) => {
   const defaultRef = useRef()
@@ -137,6 +138,10 @@ const ModalContainer = () => {
     setFilterAll(target.value)
   }
 
+  const handleDeleteRowClick = (row) => () => {
+    alert(row.original.id)
+  }
+
   const totalRows = rows.length
   const rowPerPage = pageIndex * pageSize + page.length
   const rowOnPage = rows.length > 0 ? pageIndex * pageSize + 1 : 0
@@ -217,9 +222,20 @@ const ModalContainer = () => {
                   <Fragment key={row.getRowProps().key}>
                     <tr>
                       {row.cells.map((cell) => {
+                        var icon = ''
+                        if (cell.column.id === 'acao') {
+                          icon = (
+                            <RowActions>
+                              <DeleteRow onClick={handleDeleteRowClick(row)} />
+                            </RowActions>
+                          )
+                        }
                         return (
                           <td {...cell.getCellProps()}>
-                            {cell.render('Cell')}
+                            <div className='cell'>
+                              {icon}
+                              {cell.render('Cell')}
+                            </div>
                           </td>
                         )
                       })}
@@ -264,13 +280,15 @@ const ModalContainer = () => {
   )
 }
 
-const FilterWrapper = styled.div`
-  position: relative;
-  user-select: none;
-  width: 20rem;
-  background-color: blue;
-  @media (max-width: 1024px) {
-    width: 100%;
+const RowActions = styled.div`
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: row;
+  width: 100%;
+  gap: 0.3rem;
+  cursor: pointer;
+  svg:hover {
+    color: var(--clr-primary);
   }
 `
 
@@ -347,10 +365,21 @@ const Styles = styled.div`
           border-top: 1px solid #ddd;
           border-right: 1px solid #ddd;
           .cell {
-            width: 100%;
-            display: flex;
-            gap: 0.3rem;
-          }
+              width: 100%;
+              display: flex;
+              gap: 0.3rem;
+              div.iconGroup {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-evenly;
+                gap: 0.3rem;
+                .icon {
+                  margin: 0;
+                  width: 18px;
+                  height: 18px;
+                }
+              }
+            }
           :first-child {
             div {
               justify-content: center;
