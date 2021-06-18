@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import {
   RiArrowRightSFill as ArrowRight,
   RiArrowLeftSFill as ArrowLeft
@@ -16,7 +16,7 @@ const Pagination = ({
   show
 }) => {
   return (
-    show && ( 
+    show && (
       <PaginationStyled>
         <button
           className='navButton arrow'
@@ -93,4 +93,4 @@ const PaginationStyled = styled.div`
   }
 `
 
-export default Pagination
+export default memo(Pagination)

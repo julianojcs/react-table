@@ -8,14 +8,10 @@ import React, {
   forwardRef
 } from 'react'
 import { useTable, useSortBy, useExpanded, usePagination } from 'react-table'
-import {
-  RiArrowRightSFill as ArrowRight,
-  RiArrowDownSFill as ArrowDown
-} from 'react-icons/ri'
 import sortAsc from '../Assets/sort_asc.png'
 import sortDesc from '../Assets/sort_desc.png'
 import sortBoth from '../Assets/sort_both.png'
-import { data as tableData } from '../data'
+import { data as tableData, getColumns } from '../data'
 import Pagination from './Pagination'
 import Info from './Info'
 import RowPerPage from './RowPerPage'
@@ -37,45 +33,7 @@ const ModalContainer = () => {
   const [data, setData] = useState([])
   const [filterAll, setFilterAll] = useState('')
 
-  const columns = useMemo(
-    () => [
-      {
-        // Header: () => null,
-        Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
-          <span {...getToggleAllRowsExpandedProps()}>
-            {isAllRowsExpanded ? <ArrowDown /> : <ArrowRight />}
-          </span>
-        ),
-        id: 'expander',
-        disableSortBy: true,
-        Cell: ({ row }) => (
-          <span {...row.getToggleRowExpandedProps()}>
-            {/* {row.isExpanded ? <FaChevronUp /> : <FaChevronDown />} */}
-            {row.isExpanded ? <ArrowDown /> : <ArrowRight />}
-          </span>
-        )
-      },
-      {
-        Header: 'Nome',
-        accessor: 'nome' // accessor is the "key" in the data
-      },
-      {
-        Header: 'Data Início',
-        accessor: 'dataInicio'
-      },
-      {
-        Header: 'Data Fim',
-        accessor: 'dataFim'
-      },
-      {
-        Header: 'Ação',
-        accessor: 'acao',
-        width: 50,
-        disableSortBy: true
-      }
-    ],
-    []
-  )
+  const columns = useMemo(() => getColumns, [])
 
   const {
     getTableProps,
@@ -109,12 +67,12 @@ const ModalContainer = () => {
   )
 
   const renderRowSubComponent = (row) => {
-    console.log(row.original)
     const { resumo } = row.original
     return (
-      <div>
-        Resumo:<span>{resumo}</span>
-      </div>
+      <RowDetail>
+        Resumo:
+        <span>{resumo}</span>
+      </RowDetail>
     )
   }
 
@@ -280,6 +238,18 @@ const ModalContainer = () => {
   )
 }
 
+const RowDetail = styled.div`
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--clr-primary);
+  text-align: justify;
+  span {
+    color: var(--bs-gray);
+    font-weight: 400;
+    margin: 0 0 0 10px;
+  }
+`
+
 const RowActions = styled.div`
   display: flex;
   justify-content: space-evenly;
@@ -288,7 +258,7 @@ const RowActions = styled.div`
   gap: 0.3rem;
   cursor: pointer;
   svg:hover {
-    color: var(--clr-primary);
+    color: var(--bs-danger);
   }
 `
 

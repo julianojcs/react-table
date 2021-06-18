@@ -1,4 +1,8 @@
-export const data = [
+import React from 'react'
+import { FaCaretDown as DownIcon, FaCaretRight as RightIcon } from 'react-icons/fa'
+import { BsList, BsListNested } from 'react-icons/bs'
+
+const data = [
   {
     id: 1,
     nome: 'Imagine',
@@ -56,3 +60,54 @@ export const data = [
     resumo: 'Desaparecido a 1 mês.'
   }
 ]
+
+const Header = ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
+  <div {...getToggleAllRowsExpandedProps()}>
+    {isAllRowsExpanded ? (
+      <BsListNested className='bold' />
+    ) : (
+      <BsList className='bold' />
+    )}
+  </div>
+)
+
+const Expander = ({ row }) => {
+  // console.log(row.getToggleRowExpandedProps())
+  return (
+    <div {...row.getToggleRowExpandedProps()}>
+      {row.isExpanded ? <DownIcon /> : <RightIcon />}
+    </div>
+  )
+}
+
+const getColumns = [
+  {
+    Header,
+    id: 'expander',
+    disableSortBy: true,
+    Cell: Expander
+  },
+  {
+    Header: 'Nome',
+    accessor: 'nome' // accessor is the "key" in the data
+  },
+  {
+    Header: 'Data Início',
+    accessor: 'dataInicio'
+  },
+  {
+    Header: 'Data Fim',
+    accessor: 'dataFim'
+  },
+  {
+    Header: 'Ação',
+    accessor: 'acao',
+    width: 50,
+    disableSortBy: true
+  }
+]
+
+export {
+  data,
+  getColumns
+}
