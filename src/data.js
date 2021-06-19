@@ -80,7 +80,7 @@ const Expander = ({ row }) => {
   )
 }
 
-const getColumns = [
+const getColumns = (hide) => [
   {
     Header,
     id: 'expander',
@@ -93,10 +93,12 @@ const getColumns = [
   },
   {
     Header: 'Data Início',
+    toHide: hide,
     accessor: 'dataInicio'
   },
   {
     Header: 'Data Fim',
+    toHide: hide,
     accessor: 'dataFim'
   },
   {

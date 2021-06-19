@@ -17,6 +17,7 @@ import Info from './Info'
 import RowPerPage from './RowPerPage'
 import Filter from './Filter'
 import { FaTrashAlt as DeleteRow } from 'react-icons/fa'
+import useMedia from '../hooks/useMedia'
 
 const IndeterminateCheckbox = forwardRef(({ indeterminate, ...rest }, ref) => {
   const defaultRef = useRef()
@@ -32,8 +33,12 @@ const IndeterminateCheckbox = forwardRef(({ indeterminate, ...rest }, ref) => {
 const ModalContainer = () => {
   const [data, setData] = useState([])
   const [filterAll, setFilterAll] = useState('')
+  const mobile = useMedia('(max-width: 40rem)')
 
-  const columns = useMemo(() => getColumns, [])
+  const columns = useMemo(
+    () => getColumns(mobile),
+    [mobile]
+  )
 
   const {
     getTableProps,
@@ -70,8 +75,18 @@ const ModalContainer = () => {
     const { resumo } = row.original
     return (
       <RowDetail>
-        Resumo:
-        <span>{resumo}</span>
+        <div>
+          Resumo:
+          <span>{resumo}</span>
+        </div>
+        {
+          row.cells.filter(e => e.column.toHide).map(cell => (
+            <div key={cell.column.id}>
+              {cell.column.Header}:
+              <span>{cell.value}</span>
+            </div>
+          ))
+        }
       </RowDetail>
     )
   }
@@ -161,6 +176,7 @@ const ModalContainer = () => {
                   {headerGroup.headers.map((column) => (
                     // Add the sorting props to control sorting. For this example
                     // we can add them into the header props "column.getSortByToggleProps()"
+                    (!column.toHide) &&
                     <th
                       {...column.getHeaderProps(column.getSortByToggleProps())}
                     >
@@ -189,6 +205,7 @@ const ModalContainer = () => {
                           )
                         }
                         return (
+                          (!cell.column.toHide) &&
                           <td {...cell.getCellProps()}>
                             <div className='cell'>
                               {icon}
@@ -239,14 +256,19 @@ const ModalContainer = () => {
 }
 
 const RowDetail = styled.div`
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--clr-primary);
-  text-align: justify;
-  span {
-    color: var(--bs-gray);
-    font-weight: 400;
-    margin: 0 0 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  div {
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--clr-primary);
+    text-align: justify;
+    span {
+      color: var(--bs-gray);
+      font-weight: 400;
+      margin: 0 0 0 10px;
+    }
   }
 `
 
@@ -392,12 +414,13 @@ const ModalContainerStyled = styled.div`
   border-radius: 5px;
   min-width: 70%;
   width: auto;
-  overflow: hidden;
+  overflow: auto;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 
-  @media (max-width: 37.5rem) {
+  //Breakpoints 
+  @media (max-width: 40rem) { //640px
     width: 100vw;
     height: 100vh;
     position: fixed;
@@ -405,6 +428,18 @@ const ModalContainerStyled = styled.div`
     left: 0;
     border-radius: 0;
     transform: translate(0%, 0%);
+    header {
+      border-radius: 0;
+    }
+  }
+  @media (min-width: 40rem) and (max-width: 56.25rem) { //640px e 900px
+    min-width: 90%;
+  }
+  @media (min-width: 56.25rem) and (max-width: 75rem) { //900px e 1200px
+    min-width: 85%;
+  }
+  @media (min-width: 75rem) { //1200px
+    min-width: 68rem; //1088px
   }
 `
 
