@@ -112,7 +112,7 @@ const ModalContainer = () => {
   }
 
   const handleDeleteRowClick = (row) => () => {
-    alert(row.original.id)
+    setData((prev) => prev.filter((elem) => elem.id !== row.original.id))
   }
 
   const totalRows = rows.length
@@ -125,7 +125,7 @@ const ModalContainer = () => {
       theData = tableData.filter(row => {
         var result = false
         for (const [key, value] of Object.entries(row)) {
-          if (key!=='id' && value?.toUpperCase().includes(filterAll.toUpperCase())){
+          if (key!=='id' && value?.toUpperCase().includes(filterAll.trimStart().trimEnd().toUpperCase())){
             result = true
             break
           }
@@ -299,6 +299,13 @@ const TableHeader = styled(TableComponents)`
 
 const TableFooter = styled(TableComponents)`
   align-items: flex-end;
+  gap: 1rem;
+  @media (max-width: 40rem) {
+    flex-flow: wrap;
+    & div {
+      margin-left: auto;
+    }
+  }
 `
 
 const Styles = styled.div`
