@@ -18,6 +18,7 @@ import RowPerPage from './RowPerPage'
 import Filter from './Filter'
 import { FaTrashAlt as DeleteRow } from 'react-icons/fa'
 import useMedia from '../hooks/useMedia'
+import useFocus from '../hooks/useFocus'
 
 const IndeterminateCheckbox = forwardRef(({ indeterminate, ...rest }, ref) => {
   const defaultRef = useRef()
@@ -34,6 +35,7 @@ const ModalContainer = () => {
   const [data, setData] = useState([])
   const [filterAll, setFilterAll] = useState('')
   const mobile = useMedia('(max-width: 40rem)')
+  const [inputRef, setInputFocus] = useFocus()
 
   const columns = useMemo(
     () => getColumns(mobile),
@@ -115,6 +117,11 @@ const ModalContainer = () => {
     setData((prev) => prev.filter((elem) => elem.id !== row.original.id))
   }
 
+  const handleOnClear = () => {
+    setFilterAll('')
+    setInputFocus()
+  }
+
   const totalRows = rows.length
   const rowPerPage = pageIndex * pageSize + page.length
   const rowOnPage = rows.length > 0 ? pageIndex * pageSize + 1 : 0
@@ -149,15 +156,19 @@ const ModalContainer = () => {
               Toggle All
             </div>
             {allColumns.map((column) => {
-              if ((column.id!=='expander') && (column.id!=='acao')) {
-              return (
-                <div key={column.id}>
-                  <label>
-                    <input type='checkbox' {...column.getToggleHiddenProps()} />{' '}
-                    {column.Header}
-                  </label>
-                </div>
-              )} else return null
+              if (column.id !== 'expander' && column.id !== 'acao') {
+                return (
+                  <div key={column.id}>
+                    <label>
+                      <input
+                        type='checkbox'
+                        {...column.getToggleHiddenProps()}
+                      />{' '}
+                      {column.Header}
+                    </label>
+                  </div>
+                )
+              } else return null
             })}
             <br />
           </div>
@@ -167,25 +178,34 @@ const ModalContainer = () => {
               setPageSize={(e) => setPageSize(e)}
               totalRows={totalRows}
             />
-            <Filter filterAll={filterAll} onChange={(e) => onChangeFilter(e)} />
+            <Filter 
+              filterAll={filterAll} 
+              onChange={(e) => onChangeFilter(e)} 
+              onClear={() => handleOnClear()}
+              inputRef={inputRef}
+            />
           </TableHeader>
           <table {...getTableProps()}>
             <thead>
               {headerGroups.map((headerGroup) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map((column) => (
-                    // Add the sorting props to control sorting. For this example
-                    // we can add them into the header props "column.getSortByToggleProps()"
-                    (!column.toHide) &&
-                    <th
-                      {...column.getHeaderProps(column.getSortByToggleProps())}
-                    >
-                      <div>
-                        {column.render('Header')}
-                        {generateSortingIndicator(column)}
-                      </div>
-                    </th>
-                  ))}
+                  {headerGroup.headers.map(
+                    (column) =>
+                      // Add the sorting props to control sorting. For this example
+                      // we can add them into the header props "column.getSortByToggleProps()"
+                      !column.toHide && (
+                        <th
+                          {...column.getHeaderProps(
+                            column.getSortByToggleProps()
+                          )}
+                        >
+                          <div>
+                            {column.render('Header')}
+                            {generateSortingIndicator(column)}
+                          </div>
+                        </th>
+                      )
+                  )}
                 </tr>
               ))}
             </thead>
@@ -205,13 +225,14 @@ const ModalContainer = () => {
                           )
                         }
                         return (
-                          (!cell.column.toHide) &&
-                          <td {...cell.getCellProps()}>
-                            <div className='cell'>
-                              {icon}
-                              {cell.render('Cell')}
-                            </div>
-                          </td>
+                          !cell.column.toHide && (
+                            <td {...cell.getCellProps()}>
+                              <div className='cell'>
+                                {icon}
+                                {cell.render('Cell')}
+                              </div>
+                            </td>
+                          )
                         )
                       })}
                     </tr>
@@ -232,6 +253,8 @@ const ModalContainer = () => {
               totalRows={totalRows}
               rowOnPage={rowOnPage}
               rowPerPage={rowPerPage}
+              filtered={!filterAll}
+              onClear={() => handleOnClear()}
             />
             {!!totalRows && (
               <Pagination

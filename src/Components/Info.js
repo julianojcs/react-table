@@ -1,14 +1,23 @@
 import React from 'react'
 import styled from 'styled-components'
+import Filtered from './Filtered'
 
-const Info = ({ totalRows, rowOnPage, rowPerPage }) => {
+const Info = ({ totalRows, rowOnPage, rowPerPage, filtered, onClear }) => {
   return (
     <InfoStyled>
-      {totalRows ? (
-        `Visualizando de ${rowOnPage} à ${rowPerPage} (${totalRows} registros)`
-      ) : (
-        <EmptyTable>Tabela vazia</EmptyTable>
-      )}
+      {totalRows
+        ?
+          <>
+            Visualizando de {rowOnPage} à {rowPerPage} {' '}
+            ({totalRows} registros{!filtered ? <Filtered filtered={filtered} onClear={onClear} text='filtrados'/>: ''})
+            {/* ({totalRows} registros{!filtered ? <>{' '}<Filtered>filtrados</Filtered></> : ''}) */}
+          </>
+        :
+            <EmptyTable>
+              Tabela vazia {' '}
+              {!filtered ? <Filtered filtered={filtered} onClear={onClear} text=' - com filtros'/>: ''}
+            </EmptyTable>
+      }
     </InfoStyled>
   )
 }
@@ -20,6 +29,7 @@ const EmptyTable = styled.div`
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--bs-danger);
+  margin-right: 0.3rem;
 `
 
 const InfoStyled = styled.div`
