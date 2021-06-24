@@ -114,7 +114,10 @@ const ModalContainer = () => {
   }
 
   const handleDeleteRowClick = (row) => () => {
-    setData((prev) => prev.filter((elem) => elem.id !== row.original.id))
+    // setData((prev) => prev.filter((elem) => elem.id !== row.original.id))
+    const index = tableData.findIndex((item) => item._id === row.original.id)
+    tableData.splice(index, 1)
+    setData([...tableData])
   }
 
   const handleOnClear = () => {
